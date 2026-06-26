@@ -24,8 +24,9 @@ const features = [
   },
   {
     icon: Cat,
-    title: 'Macskabiztos PET háló',
-    desc: 'Kérhető erősebb, sűrűbben szőtt PET hálóval, kisállatok mellé is.',
+    title: 'Macskabiztos PET háló – hamarosan',
+    desc: 'Dolgozunk rajta, hogy a macskabiztos PET háló opció is hamarosan rendelhető legyen.',
+    comingSoon: true,
   },
   {
     icon: Award,
@@ -99,8 +100,15 @@ export default function Benefits() {
             <motion.div
               key={i}
               variants={itemVariants}
-              className="group bg-white hover:bg-orange-tint transition-colors duration-300 p-5 flex flex-col gap-4 cursor-default"
+              className={`group bg-white hover:bg-orange-tint transition-colors duration-300 p-5 flex flex-col gap-4 cursor-default relative ${
+                'comingSoon' in f && f.comingSoon ? 'opacity-80' : ''
+              }`}
             >
+              {'comingSoon' in f && f.comingSoon && (
+                <span className="absolute top-3 right-3 bg-orange/10 text-orange text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-orange/20">
+                  Hamarosan
+                </span>
+              )}
               {/* Icon */}
               <div className="w-10 h-10 rounded-xl bg-orange-tint group-hover:bg-orange/15 transition-colors duration-300 flex items-center justify-center flex-shrink-0 shadow-glow-sm group-hover:shadow-glow-sm">
                 <f.icon size={18} className="text-orange" strokeWidth={2} />

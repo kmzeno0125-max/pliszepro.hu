@@ -247,7 +247,7 @@ export default function QuoteRequest() {
                         className="w-full border border-line rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange transition-colors bg-white"
                       >
                         <option>Standard</option>
-                        <option>Macskabiztos PET</option>
+                        <option disabled>Macskabiztos PET (hamarosan)</option>
                       </select>
                     </div>
                   </div>

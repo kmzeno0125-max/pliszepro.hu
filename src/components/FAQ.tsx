@@ -9,7 +9,7 @@ const faqs = [
   },
   {
     q: 'Macskabiztos kivitel is van?',
-    a: 'Igen. Erősebb, sűrűbben szőtt PET hálóval kérhető, amely jobban ellenáll a kisállatok terhelésének, így ideális cica vagy kistestű kutya mellé.',
+    a: 'Hamarosan! Dolgozunk az erősebb, sűrűbben szőtt PET hálós opción, amely jobban ellenáll a kisállatok terhelésének. Ez az opció hamarosan elérhető lesz kínálatunkban.',
   },
   {
     q: 'Mekkora méretig gyártható?',

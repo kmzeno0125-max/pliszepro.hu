@@ -5,7 +5,7 @@ const items = [
   { icon: Wrench, text: '100% alumínium szerkezet' },
   { icon: Shield, text: '17 mm-es profil' },
   { icon: Palette, text: 'Bármilyen RAL szín' },
-  { icon: Cat, text: 'Macskabiztos PET háló' },
+  { icon: Cat, text: 'Macskabiztos PET háló – hamarosan' },
   { icon: MapPin, text: 'Ingyenes felmérés' },
   { icon: Award, text: 'Teljes körű garancia' },
   { icon: Truck, text: 'Kiszállítás és beépítés' },

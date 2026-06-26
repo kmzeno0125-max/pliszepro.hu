@@ -5,9 +5,9 @@ import { Phone, Shield, Cat, Truck } from 'lucide-react';
 const words = ['Egyedi', 'pliszé', 'szúnyogháló,', 'méretre', 'szabva'];
 
 const trustChips = [
-  { icon: Shield, label: 'Teljes körű garancia' },
-  { icon: Cat, label: 'Macskabiztos opció' },
-  { icon: Truck, label: 'Kiszállítjuk és beépítjük' },
+  { icon: Shield, label: 'Teljes körű garancia', comingSoon: false },
+  { icon: Cat, label: 'Macskabiztos PET háló – hamarosan', comingSoon: true },
+  { icon: Truck, label: 'Kiszállítjuk és beépítjük', comingSoon: false },
 ];
 
 export default function Hero() {
@@ -121,10 +121,19 @@ export default function Hero() {
             {trustChips.map(chip => (
               <div
                 key={chip.label}
-                className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 rounded-full px-4 py-2"
+                className={`flex items-center gap-2 backdrop-blur-md border rounded-full px-4 py-2 ${
+                  chip.comingSoon
+                    ? 'bg-white/5 border-white/10 opacity-75'
+                    : 'bg-white/10 border-white/15'
+                }`}
               >
                 <chip.icon size={16} className="text-orange" />
                 <span className="text-white/90 text-sm font-medium">{chip.label}</span>
+                {chip.comingSoon && (
+                  <span className="bg-orange/20 text-orange text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+                    Soon
+                  </span>
+                )}
               </div>
             ))}
           </motion.div>

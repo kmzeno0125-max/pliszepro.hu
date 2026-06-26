@@ -82,14 +82,18 @@ export default function HowItWorks() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="rounded-2xl overflow-hidden shadow-card-hover ring-1 ring-orange/10"
+            className="rounded-2xl overflow-hidden shadow-card-hover ring-1 ring-orange/10 relative"
           >
             <img
               src="/images/cat-plisze-jpg.png"
-              alt="Macskabiztos pliszé szúnyogháló működés közben"
+              alt="Macskabiztos pliszé szúnyogháló – hamarosan elérhető"
               className="w-full h-full object-cover aspect-[4/3]"
               loading="lazy"
             />
+            <div className="absolute bottom-4 right-4 bg-ink/80 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-orange/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />
+              PET háló – hamarosan
+            </div>
           </motion.div>
         </div>
       </div>
