@@ -112,6 +112,24 @@ export default function BeforeAfter() {
             </div>
           </div>
         </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-10 text-center"
+        >
+          <p className="text-muted text-sm mb-4">Ugyanezt szeretné otthonában is?</p>
+          <a
+            href="#ajanlatkeres"
+            onClick={e => { e.preventDefault(); document.querySelector('#ajanlatkeres')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="btn-primary text-sm px-6 py-2.5 inline-flex"
+          >
+            Kérek ajánlatot a saját méretemre
+          </a>
+        </motion.div>
       </div>
     </section>
   );

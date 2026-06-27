@@ -96,6 +96,24 @@ export default function HowItWorks() {
             </div>
           </motion.div>
         </div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-12 text-center"
+        >
+          <p className="text-muted text-sm mb-4">Nem biztos a méretben? Segítünk a pontos felmérésben.</p>
+          <a
+            href="#ajanlatkeres"
+            onClick={e => { e.preventDefault(); document.querySelector('#ajanlatkeres')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="btn-primary text-sm px-6 py-2.5 inline-flex"
+          >
+            Felmérést és beépítést kérek
+          </a>
+        </motion.div>
       </div>
     </section>
   );

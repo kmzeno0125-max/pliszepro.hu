@@ -116,6 +116,26 @@ export default function AboutMe() {
             ))}
           </div>
         </div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-14 bg-white border border-line-warm rounded-2xl p-6 md:p-8 text-center shadow-card"
+        >
+          <p className="text-ink text-sm md:text-base leading-relaxed max-w-lg mx-auto mb-5">
+            Nem sablonmegoldást keres? Nézzük meg, milyen pliszé illik az Ön nyílászárójára.
+          </p>
+          <a
+            href="#ajanlatkeres"
+            onClick={e => { e.preventDefault(); document.querySelector('#ajanlatkeres')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="btn-primary text-sm px-6 py-2.5 inline-flex"
+          >
+            Egyeztessünk felmérést
+          </a>
+        </motion.div>
       </div>
     </section>
   );

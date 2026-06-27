@@ -132,6 +132,33 @@ export default function Benefits() {
           ))}
         </motion.div>
 
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-12 text-center"
+        >
+          <p className="text-muted text-sm mb-4">Szeretné pontos méretre kérni?</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="#ajanlatkeres"
+              onClick={e => { e.preventDefault(); document.querySelector('#ajanlatkeres')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="btn-primary text-sm px-6 py-2.5"
+            >
+              Kérek személyre szabott ajánlatot
+            </a>
+            <a
+              href="#kalkulator"
+              onClick={e => { e.preventDefault(); document.querySelector('#kalkulator')?.scrollIntoView({ behavior: 'smooth' }); }}
+              className="btn-secondary text-sm px-6 py-2.5"
+            >
+              Megnézem a kalkulátort
+            </a>
+          </div>
+        </motion.div>
+
       </div>
     </section>
   );
