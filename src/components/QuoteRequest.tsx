@@ -119,7 +119,15 @@ export default function QuoteRequest() {
   const canAdvanceStep3 = form.name.trim().length > 0 && form.phone.trim().length > 0 && form.email.trim().length > 0 && form.gdpr;
 
   const handleSubmit = async () => {
-    console.log('Quote form submitted:', form);
+    if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
+      (window as any).fbq('track', 'Lead', {
+        content_name: form.installOption === 'survey' ? 'Felmérés + beépítés' : 'Csak termék',
+        content_category: 'Ajánlatkérés',
+      });
+      if (form.installOption === 'survey') {
+        (window as any).fbq('track', 'Schedule');
+      }
+    }
     await new Promise(resolve => setTimeout(resolve, 1200));
     setSubmitted(true);
   };

@@ -105,6 +105,7 @@ export default function Hero() {
             <a
               href="tel:+36704224909"
               className="btn-white-outline text-lg px-8 py-4"
+              onClick={() => { if (typeof (window as any).fbq === 'function') (window as any).fbq('track', 'Contact'); }}
             >
               <Phone size={18} />
               Hívjon most
