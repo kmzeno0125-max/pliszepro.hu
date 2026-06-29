@@ -73,8 +73,10 @@ export default function QuoteRequest() {
   const [submitted, setSubmitted] = useState(false);
   const [direction, setDirection] = useState(1);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReady, setTurnstileReady] = useState(false);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
+  const hasSiteKey = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -115,20 +117,22 @@ export default function QuoteRequest() {
       theme: 'light',
       language: 'hu',
     });
+    setTurnstileReady(true);
   }, []);
 
   useEffect(() => {
-    if (step === 3) {
+    if (step === 3 && hasSiteKey) {
       const timer = setTimeout(renderTurnstile, 100);
       return () => clearTimeout(timer);
     } else {
       setTurnstileToken(null);
+      setTurnstileReady(false);
       if (turnstileWidgetId.current && (window as any).turnstile) {
         (window as any).turnstile.remove(turnstileWidgetId.current);
         turnstileWidgetId.current = null;
       }
     }
-  }, [step, renderTurnstile]);
+  }, [step, hasSiteKey, renderTurnstile]);
 
   const update = (field: keyof FormData, value: string | boolean | number) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -149,7 +153,7 @@ export default function QuoteRequest() {
   };
 
   const canAdvanceStep2 = form.city.trim().length > 0;
-  const canAdvanceStep3 = form.name.trim().length > 0 && form.phone.trim().length > 0 && form.email.trim().length > 0 && form.gdpr && !!turnstileToken;
+  const canAdvanceStep3 = form.name.trim().length > 0 && form.phone.trim().length > 0 && form.email.trim().length > 0 && form.gdpr && (!hasSiteKey || !!turnstileToken);
 
   const handleSubmit = async () => {
     if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
@@ -527,21 +531,29 @@ export default function QuoteRequest() {
                   </div>
 
                   {/* Turnstile CAPTCHA */}
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck size={14} className="text-muted/70" />
-                      <span className="text-xs font-medium text-muted">Biztonsági ellenőrzés</span>
+                  {hasSiteKey ? (
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={14} className="text-muted/70" />
+                        <span className="text-xs font-medium text-muted">{`Biztons\u00e1gi ellen\u0151rz\u00e9s`}</span>
+                      </div>
+                      <div
+                        ref={turnstileRef}
+                        className="flex items-center justify-center rounded-xl overflow-hidden"
+                      />
+                      {turnstileReady && !turnstileToken && form.gdpr && form.name && form.phone && form.email && (
+                        <p className="text-xs text-orange">
+                          {`K\u00e9rj\u00fck, er\u0151s\u00edtse meg, hogy nem robot.`}
+                        </p>
+                      )}
                     </div>
-                    <div
-                      ref={turnstileRef}
-                      className="flex items-center justify-center min-h-[65px] rounded-xl border border-line bg-sand/30 overflow-hidden [&>iframe]:!rounded-xl"
-                    />
-                    {!turnstileToken && form.gdpr && form.name && form.phone && form.email && (
-                      <p className="text-xs text-orange">
-                        Kérjük, erősítse meg, hogy nem robot.
+                  ) : import.meta.env.DEV ? (
+                    <div className="mt-4 rounded-xl border border-dashed border-orange/40 bg-orange-tint px-4 py-3">
+                      <p className="text-xs text-orange font-medium">
+                        {`CAPTCHA be\u00e1ll\u00edt\u00e1s sz\u00fcks\u00e9ges: add meg a VITE_TURNSTILE_SITE_KEY \u00e9rt\u00e9ket a .env f\u00e1jlban.`}
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  ) : null}
 
                   <div className="flex justify-between pt-4">
                     <button onClick={goBack} className="btn-secondary text-sm px-5 py-2.5">
