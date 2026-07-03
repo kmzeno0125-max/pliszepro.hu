@@ -76,6 +76,7 @@ export default function QuoteRequest() {
   const [honeypot, setHoneypot] = useState('');
   const [submitError, setSubmitError] = useState('');
   const formLoadTime = useRef(Date.now());
+  const formCardRef = useRef<HTMLDivElement>(null);
   const mathChallenge = useMemo(() => {
     const a = Math.floor(Math.random() * 9) + 1;
     const b = Math.floor(Math.random() * 9) + 1;
@@ -115,13 +116,25 @@ export default function QuoteRequest() {
     goNext();
   };
 
+  const scrollToForm = () => {
+    setTimeout(() => {
+      if (formCardRef.current) {
+        const navbarHeight = 80;
+        const top = formCardRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 50);
+  };
+
   const goNext = () => {
     setDirection(1);
     setStep(s => Math.min(s + 1, 3));
+    scrollToForm();
   };
   const goBack = () => {
     setDirection(-1);
     setStep(s => Math.max(s - 1, 1));
+    scrollToForm();
   };
 
   const canAdvanceStep2 = form.city.trim().length > 0;
@@ -252,7 +265,7 @@ export default function QuoteRequest() {
           </div>
 
           {/* Steps */}
-          <div className="bg-white border border-line-warm rounded-2xl p-6 md:p-8 min-h-[400px] relative overflow-hidden shadow-card-warm ring-1 ring-orange/5">
+          <div ref={formCardRef} className="bg-white border border-line-warm rounded-2xl p-6 md:p-8 min-h-[400px] relative overflow-hidden shadow-card-warm ring-1 ring-orange/5">
             <AnimatePresence custom={direction} mode="wait">
               {step === 1 && (
                 <motion.div
