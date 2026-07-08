@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Truck, ArrowLeft, ArrowRight, CheckCircle2, Info, FileText, Package, ShieldCheck } from 'lucide-react';
+import { getFbp, getFbc } from '../lib/meta-tracking';
 
 type InstallOption = 'self' | 'survey' | null;
 type ColorType = 'white' | 'antracit' | 'custom_ral' | 'combo';
@@ -157,14 +158,18 @@ export default function QuoteRequest() {
       return;
     }
 
-    if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
-      (window as any).fbq('track', 'Lead', {
-        content_name: form.installOption === 'survey' ? 'Felmérés + beépítés' : 'Csak termék',
-        content_category: 'Ajánlatkérés',
-      });
-      if (form.installOption === 'survey') {
-        (window as any).fbq('track', 'Schedule');
+    const eventId = crypto.randomUUID();
+
+    try {
+      const fbq = (window as any).fbq;
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', { content_name: 'Lead form' }, { eventID: eventId });
+        if (form.installOption === 'survey') {
+          fbq('track', 'Schedule');
+        }
       }
+    } catch (_) {
+      // Never block submission if tracking fails
     }
 
     try {
@@ -186,6 +191,12 @@ export default function QuoteRequest() {
           telefon: form.phone,
           email: form.email,
           becsult_ar_netto: form.estimatedPrice,
+          event_id: eventId,
+          event_name: 'Lead',
+          fbp: getFbp(),
+          fbc: getFbc(),
+          event_source_url: window.location.href,
+          client_user_agent: navigator.userAgent,
         }),
       });
     } catch (_) {
