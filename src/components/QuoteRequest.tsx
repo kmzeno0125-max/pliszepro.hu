@@ -163,7 +163,6 @@ export default function QuoteRequest() {
     try {
       const fbq = (window as any).fbq;
       if (typeof fbq === 'function') {
-        fbq('track', 'Lead', { content_name: 'Lead form' }, { eventID: eventId });
         if (form.installOption === 'survey') {
           fbq('track', 'Schedule');
         }
