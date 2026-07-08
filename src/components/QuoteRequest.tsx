@@ -203,6 +203,26 @@ export default function QuoteRequest() {
       // Submission UI proceeds regardless of webhook delivery
     }
 
+    try {
+      fetch('https://services.leadconnectorhq.com/hooks/WVILUafkMwFTamabZKQl/webhook-trigger/3def612a-6e7f-4120-aea4-bca28d71f6a0', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_id: eventId,
+          event_name: 'Lead',
+          fbp: getFbp(),
+          fbc: getFbc(),
+          event_source_url: window.location.href,
+          client_user_agent: navigator.userAgent,
+          nev: form.name,
+          email: form.email,
+          telefon: form.phone,
+        }),
+      });
+    } catch (_) {
+      // Non-blocking
+    }
+
     setSubmitted(true);
   };
 
