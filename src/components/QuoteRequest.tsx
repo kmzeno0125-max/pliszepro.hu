@@ -1,10 +1,16 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Truck, ArrowLeft, ArrowRight, CheckCircle2, Info, FileText, Package, ShieldCheck } from 'lucide-react';
+import { Truck, ArrowLeft, ArrowRight, CheckCircle2, Info, FileText, Package, MapPin } from 'lucide-react';
 import { getFbp, getFbc } from '../lib/meta-tracking';
 
 type InstallOption = 'self' | 'survey' | null;
 type ColorType = 'white' | 'antracit' | 'custom_ral' | 'combo';
+
+const AVAILABLE_COUNTIES = [
+  'Győr-Moson-Sopron vármegye',
+  'Fejér vármegye',
+  'Komárom-Esztergom vármegye',
+];
 
 interface FormData {
   installOption: InstallOption;
@@ -14,6 +20,7 @@ interface FormData {
   color: ColorType;
   ralCode: string;
   mesh: string;
+  county: string;
   city: string;
   preferredDate: string;
   message: string;
@@ -32,6 +39,7 @@ const initialForm: FormData = {
   color: 'white',
   ralCode: '',
   mesh: 'Standard',
+  county: '',
   city: '',
   preferredDate: '',
   message: '',
@@ -73,16 +81,11 @@ export default function QuoteRequest() {
   const [form, setForm] = useState<FormData>(initialForm);
   const [submitted, setSubmitted] = useState(false);
   const [direction, setDirection] = useState(1);
-  const [securityAnswer, setSecurityAnswer] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [submitError, setSubmitError] = useState('');
+  const [gdprError, setGdprError] = useState(false);
   const formLoadTime = useRef(Date.now());
   const formCardRef = useRef<HTMLDivElement>(null);
-  const mathChallenge = useMemo(() => {
-    const a = Math.floor(Math.random() * 9) + 1;
-    const b = Math.floor(Math.random() * 9) + 1;
-    return { a, b, answer: a + b };
-  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -110,6 +113,7 @@ export default function QuoteRequest() {
 
   const update = (field: keyof FormData, value: string | boolean | number) => {
     setForm(prev => ({ ...prev, [field]: value }));
+    if (field === 'gdpr') setGdprError(false);
   };
 
   const selectInstall = (option: InstallOption) => {
@@ -138,12 +142,15 @@ export default function QuoteRequest() {
     scrollToForm();
   };
 
-  const canAdvanceStep2 = form.city.trim().length > 0;
-  const isMathCorrect = securityAnswer.trim() === String(mathChallenge.answer);
-  const canAdvanceStep3 = form.name.trim().length > 0 && form.phone.trim().length > 0 && form.email.trim().length > 0 && form.gdpr && isMathCorrect;
+  const canAdvanceStep2 = form.installOption === 'survey'
+    ? form.county.trim().length > 0 && form.city.trim().length > 0
+    : form.city.trim().length > 0;
+
+  const canAdvanceStep3 = form.name.trim().length > 0 && form.phone.trim().length > 0 && form.email.trim().length > 0 && form.gdpr;
 
   const handleSubmit = async () => {
     setSubmitError('');
+    setGdprError(false);
 
     if (honeypot) return;
 
@@ -153,8 +160,8 @@ export default function QuoteRequest() {
       return;
     }
 
-    if (!isMathCorrect) {
-      setSubmitError('Kérjük, adja meg a helyes választ a biztonsági ellenőrzéshez.');
+    if (!form.gdpr) {
+      setGdprError(true);
       return;
     }
 
@@ -183,6 +190,7 @@ export default function QuoteRequest() {
           szin: form.color === 'white' ? 'Fehér' : form.color === 'antracit' ? 'Antracit' : form.color === 'custom_ral' ? 'Egyedi RAL' : 'Színkombináció',
           ral_kod: form.ralCode,
           halo_tipus: form.mesh,
+          varmegye: form.county,
           telepules: form.city,
           kivant_idopont: form.preferredDate,
           uzenet: form.message,
@@ -297,7 +305,7 @@ export default function QuoteRequest() {
                     >
                       <Package size={28} className="text-orange mb-3" />
                       <h4 className="font-display font-semibold text-lg text-ink mb-1">Csak terméket kérek</h4>
-                      <p className="text-sm text-muted">A pliszé szúnyoghálót méretre gyártva kérheti, a beépítést saját maga végzi.</p>
+                      <p className="text-sm text-muted">A pliszé szúnyoghálót méretre gyártva kéri, a beépítést saját maga végzi. Szállítás országosan elérhető.</p>
                     </button>
                     <button
                       onClick={() => selectInstall('survey')}
@@ -307,9 +315,32 @@ export default function QuoteRequest() {
                     >
                       <Truck size={28} className="text-orange mb-3" />
                       <h4 className="font-display font-semibold text-lg text-ink mb-1">Felmérést és beépítést is kérek</h4>
-                      <p className="text-sm text-muted">Helyszíni felméréssel és szakszerű beépítéssel készítünk ajánlatot.</p>
+                      <p className="text-sm text-muted">Helyszíni felméréssel és szakszerű beépítéssel kér ajánlatot. Jelenleg Győr-Moson-Sopron, Fejér és Komárom-Esztergom vármegyében elérhető.</p>
                     </button>
                   </div>
+
+                  {/* Territorial info banner */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mt-6 flex items-start gap-3 bg-orange/[0.05] border border-orange/15 rounded-xl px-4 py-3.5"
+                  >
+                    <MapPin size={16} className="text-orange shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs text-ink/80 leading-relaxed">
+                        A szállítás országosan elérhető. A helyszíni felmérés és beépítés jelenleg elérhető:
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {AVAILABLE_COUNTIES.map(county => (
+                          <span key={county} className="inline-flex items-center gap-1 bg-orange/10 text-orange text-[11px] font-medium px-2.5 py-1 rounded-full">
+                            <MapPin size={10} />
+                            {county.replace(' vármegye', '')}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
 
                   {form.installOption === 'self' && (
                     <motion.div
@@ -422,6 +453,26 @@ export default function QuoteRequest() {
                     </div>
                   )}
 
+                  {/* County selector for survey option */}
+                  {form.installOption === 'survey' && (
+                    <div>
+                      <label className="text-xs font-medium text-muted mb-1 block">Vármegye *</label>
+                      <select
+                        value={form.county}
+                        onChange={e => update('county', e.target.value)}
+                        className="w-full border border-line rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange transition-colors bg-white"
+                      >
+                        <option value="">Kérjük, válasszon...</option>
+                        {AVAILABLE_COUNTIES.map(county => (
+                          <option key={county} value={county}>{county}</option>
+                        ))}
+                      </select>
+                      <p className="text-[11px] text-muted/70 mt-1.5">
+                        Helyszíni felmérést és beépítést jelenleg ezekben a vármegyékben vállalunk.
+                      </p>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-medium text-muted mb-1 block">Település *</label>
@@ -520,17 +571,26 @@ export default function QuoteRequest() {
                       />
                     </div>
                   </div>
-                  <label className="flex items-start gap-3 cursor-pointer pt-2">
-                    <input
-                      type="checkbox"
-                      checked={form.gdpr}
-                      onChange={e => update('gdpr', e.target.checked)}
-                      className="mt-0.5 w-5 h-5 rounded border-line text-orange focus:ring-orange"
-                    />
-                    <span className="text-sm text-muted">
-                      Hozzájárulok az adataim kezeléséhez.
-                    </span>
-                  </label>
+
+                  {/* GDPR consent */}
+                  <div className="pt-2">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.gdpr}
+                        onChange={e => update('gdpr', e.target.checked)}
+                        className="mt-0.5 w-5 h-5 rounded border-line text-orange focus:ring-orange"
+                      />
+                      <span className="text-sm text-muted">
+                        Hozzájárulok az adataim kezeléséhez.
+                      </span>
+                    </label>
+                    {gdprError && (
+                      <p className="text-xs text-orange mt-1.5 ml-8 font-medium">
+                        Kérjük, fogadja el az adatkezelési hozzájárulást.
+                      </p>
+                    )}
+                  </div>
 
                   {/* 50% deposit note */}
                   <div className="flex items-start gap-2.5 bg-warm-beige rounded-xl px-4 py-3 mt-2">
@@ -538,29 +598,6 @@ export default function QuoteRequest() {
                     <p className="text-xs text-muted leading-relaxed">
                       Megrendelés esetén a gyártás indításához 50% díjbekérő szükséges.
                     </p>
-                  </div>
-
-                  {/* Custom bot protection - math challenge */}
-                  <div className="mt-4 rounded-xl border border-line bg-sand/20 px-4 py-3.5 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck size={14} className="text-orange/70" />
-                      <span className="text-xs font-medium text-ink/70">Biztonsági ellenőrzés</span>
-                    </div>
-                    <p className="text-sm text-muted">
-                      Mennyi {mathChallenge.a} + {mathChallenge.b}?
-                    </p>
-                    <input
-                      type="number"
-                      value={securityAnswer}
-                      onChange={e => { setSecurityAnswer(e.target.value); setSubmitError(''); }}
-                      className="w-24 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange transition-colors"
-                      placeholder="?"
-                    />
-                    {securityAnswer && !isMathCorrect && (
-                      <p className="text-xs text-orange">
-                        Kérjük, adja meg a helyes választ a biztonsági ellenőrzéshez.
-                      </p>
-                    )}
                   </div>
 
                   {/* Honeypot - hidden from real users */}
